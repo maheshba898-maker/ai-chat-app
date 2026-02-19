@@ -1,23 +1,39 @@
-# Node modules
+# Dependencies
 node_modules/
-client/node_modules/
-server/node_modules/
+/.pnp
+.pnp.js
+.yarn/install-state.gz
 
 # Environment files
 .env
 .env.local
-client/.env
-server/.env
+.env.development.local
+.env.test.local
+.env.production.local
 
-# Build output
+# Build outputs
 dist/
-client/dist/
-server/dist/
+build/
+/client/dist
+/server/dist
 
 # Logs
-*.log
 npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
 
 # OS files
-.DS_Store
 Thumbs.db

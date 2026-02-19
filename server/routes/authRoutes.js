@@ -39,7 +39,8 @@
 import express from "express";
 import bcrypt from "bcryptjs";
 import User from "../models/user.js"; // Capitalized model name
-
+import dotenv from 'dotenv';
+dotenv.config();
 const router = express.Router();
 
 // Register user
