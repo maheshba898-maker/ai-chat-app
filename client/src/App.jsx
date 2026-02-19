@@ -18,7 +18,7 @@ function App() {
     scrollToBottom();
   }, [messages]);
 
-  // Load files on startup with error handling
+  // Load files on startup
   useEffect(() => {
     fetchFiles();
   }, []);
@@ -30,11 +30,10 @@ function App() {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
-      // Ensure data is an array
       setFiles(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("Error fetching files:", error);
-      setFiles([]); // Set to empty array on error
+      setFiles([]);
     }
   };
 
@@ -101,19 +100,19 @@ function App() {
       });
 
       if (response.ok) {
-        setUploadStatus("Upload successful!");
-        fetchFiles(); // Refresh file list
+        setUploadStatus("✅ Upload successful!");
+        fetchFiles();
         setTimeout(() => setUploadStatus(""), 3000);
       } else {
-        setUploadStatus("Upload failed");
+        const error = await response.json();
+        setUploadStatus(`❌ Upload failed: ${error.error || "Unknown error"}`);
       }
     } catch (error) {
       console.error("Upload error:", error);
-      setUploadStatus("Upload error");
+      setUploadStatus("❌ Upload error");
     }
   };
 
-  // Safe file size formatter
   const formatFileSize = (bytes) => {
     if (!bytes || bytes === 0) return "0 B";
     if (bytes < 1024) return bytes + " B";
@@ -121,7 +120,6 @@ function App() {
     return (bytes / (1024 * 1024)).toFixed(1) + " MB";
   };
 
-  // Safe file icon getter
   const getFileIcon = (filename) => {
     if (!filename) return "📄";
     const ext = filename.split(".").pop()?.toLowerCase() || "";
@@ -137,6 +135,15 @@ function App() {
       mp4: "🎥",
       mp3: "🎵",
       zip: "📦",
+      rar: "📦",
+      js: "📜",
+      jsx: "📜",
+      ts: "📜",
+      tsx: "📜",
+      html: "🌐",
+      css: "🎨",
+      json: "📋",
+      md: "📝",
     };
     return icons[ext] || "📄";
   };
@@ -148,7 +155,7 @@ function App() {
         background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
         display: "flex",
         flexDirection: "column",
-        alignItems: "center", // This centers everything horizontally
+        alignItems: "center",
       }}
     >
       {/* Header */}
@@ -161,7 +168,7 @@ function App() {
           boxShadow: "0 2px 20px rgba(0,0,0,0.1)",
           marginBottom: "30px",
           display: "flex",
-          justifyContent: "center", // Center header content
+          justifyContent: "center",
         }}
       >
         <div
@@ -203,14 +210,15 @@ function App() {
             gap: "30px",
             maxWidth: "1200px",
             width: "100%",
-            justifyContent: "center", // Center the cards horizontally
+            justifyContent: "center",
+            flexWrap: "wrap",
           }}
         >
           {/* Cloud Drive Card */}
           <div
             style={{
-              flex: "1",
-              maxWidth: "500px", // Limit card width
+              flex: "1 1 400px",
+              maxWidth: "500px",
               background: "white",
               borderRadius: "20px",
               padding: "30px",
@@ -225,7 +233,7 @@ function App() {
                 alignItems: "center",
                 gap: "10px",
                 color: "#333",
-                justifyContent: "center", // Center the title
+                justifyContent: "center",
               }}
             >
               <span style={{ fontSize: "2.2rem" }}>☁️</span>
@@ -246,6 +254,12 @@ function App() {
                 transition: "all 0.3s",
                 width: "100%",
               }}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.background = "#e9ecef")
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.background = "#f8f9fa")
+              }
             >
               <div style={{ fontSize: "3rem", marginBottom: "10px" }}>📤</div>
               <p
@@ -274,7 +288,7 @@ function App() {
                 fontSize: "1.3rem",
                 marginBottom: "20px",
                 color: "#555",
-                textAlign: "center", // Center the subtitle
+                textAlign: "center",
               }}
             >
               Recent Files
@@ -295,11 +309,19 @@ function App() {
                       display: "flex",
                       alignItems: "center",
                       gap: "15px",
-                      padding: "15px",
+                      padding: "12px",
                       borderBottom: "1px solid #eee",
                       borderRadius: "10px",
                       marginBottom: "5px",
+                      transition: "background 0.2s",
+                      cursor: "pointer",
                     }}
+                    onMouseEnter={(e) =>
+                      (e.currentTarget.style.background = "#f8f9fa")
+                    }
+                    onMouseLeave={(e) =>
+                      (e.currentTarget.style.background = "transparent")
+                    }
                   >
                     <span style={{ fontSize: "2rem" }}>
                       {getFileIcon(file?.name)}
@@ -350,8 +372,8 @@ function App() {
           {/* Chat Card */}
           <div
             style={{
-              flex: "1",
-              maxWidth: "500px", // Limit card width
+              flex: "1 1 400px",
+              maxWidth: "500px",
               background: "white",
               borderRadius: "20px",
               padding: "30px",
@@ -509,7 +531,10 @@ function App() {
                   fontFamily: "inherit",
                   resize: "none",
                   outline: "none",
+                  transition: "border-color 0.3s",
                 }}
+                onFocus={(e) => (e.target.style.borderColor = "#667eea")}
+                onBlur={(e) => (e.target.style.borderColor = "#e0e0e0")}
                 disabled={loading}
               />
               <button
@@ -525,8 +550,17 @@ function App() {
                   fontWeight: "600",
                   cursor: "pointer",
                   opacity: loading || !input.trim() ? 0.5 : 1,
-                  transition: "transform 0.2s",
+                  transition: "transform 0.2s, box-shadow 0.2s",
+                  boxShadow: "0 4px 15px rgba(102, 126, 234, 0.4)",
                 }}
+                onMouseEnter={(e) =>
+                  !loading &&
+                  input.trim() &&
+                  (e.target.style.transform = "translateY(-2px)")
+                }
+                onMouseLeave={(e) =>
+                  (e.target.style.transform = "translateY(0)")
+                }
               >
                 Send 📤
               </button>
@@ -538,8 +572,8 @@ function App() {
       {/* Animations */}
       <style>{`
         @keyframes pulse {
-          0%, 100% { opacity: 0.4; }
-          50% { opacity: 1; }
+          0%, 100% { opacity: 0.4; transform: scale(1); }
+          50% { opacity: 1; transform: scale(1.2); }
         }
       `}</style>
     </div>
